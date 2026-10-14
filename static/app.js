@@ -18,7 +18,7 @@
     customName: '',
     phone: 'android',
     voice: 'female',
-    script: null, // {title, intro, steps[], recap, safety, close, note}
+    script: null, // {title, intro, steps[], recap, safety, note}
     scriptLang: null, // language the editor text is written in
     scriptFor: null, // {relation, customName, phone} at writing time
     safetyOn: true,
@@ -270,7 +270,6 @@
       steps: steps.slice(0, maxSteps()),
       recap: str(s && s.recap),
       safety: s && typeof s.safety === 'string' && s.safety.trim() ? s.safety : null,
-      close: str(s && s.close),
       note: s && typeof s.note === 'string' && s.note.trim() ? s.note : null,
     };
   }
@@ -295,7 +294,7 @@
     note.hidden = !state.script.note;
     note.textContent = state.script.note || '';
 
-    const fields = { 'f-intro': 'intro', 'f-recap': 'recap', 'f-safety': 'safety', 'f-close': 'close' };
+    const fields = { 'f-intro': 'intro', 'f-recap': 'recap', 'f-safety': 'safety' };
     for (const [id, key] of Object.entries(fields)) {
       const ta = $(id);
       ta.lang = lang;
@@ -352,21 +351,10 @@
     list.querySelectorAll('.part-text').forEach(grow);
   }
 
-  function fixIntroCount(oldN, newN) {
-    const re = new RegExp(`(^|[^0-9])${oldN}(?![0-9])`);
-    const intro = $('f-intro');
-    if (re.test(intro.value)) {
-      intro.value = intro.value.replace(re, `$1${newN}`);
-      state.script.intro = intro.value;
-      grow(intro);
-    }
-  }
-
   function removeStep(i) {
     const n = state.script.steps.length;
     if (n <= 1) return;
     state.script.steps.splice(i, 1);
-    fixIntroCount(n, n - 1);
     renderSteps();
     markDirty();
     updateMakeSub();
@@ -378,7 +366,6 @@
     const n = state.script.steps.length;
     if (n >= maxSteps()) return;
     state.script.steps.push('');
-    fixIntroCount(n, n + 1);
     renderSteps();
     markDirty();
     updateMakeSub();
@@ -419,17 +406,12 @@
   function collectScript() {
     const s = state.script;
     const steps = s.steps.map((t) => t.trim()).filter(Boolean);
-    let intro = s.intro.trim();
-    if (steps.length !== s.steps.length) {
-      intro = intro.replace(new RegExp(`(^|[^0-9])${s.steps.length}(?![0-9])`), `$1${steps.length}`);
-    }
     return {
       title: s.title || '',
-      intro,
+      intro: s.intro.trim(),
       steps,
       recap: s.recap.trim(),
       safety: state.safetyOn && s.safety && s.safety.trim() ? s.safety.trim() : null,
-      close: s.close.trim(),
       note: s.note || null,
     };
   }
@@ -482,8 +464,6 @@
     script.steps.forEach((s) => { speak(s); segs.push({ talk: false, len: pauseSeconds() }); });
     speak(script.recap);
     if (script.safety) { segs.push({ talk: false, len: 1 }); speak(script.safety); }
-    segs.push({ talk: false, len: 0.8 });
-    speak(script.close);
     const total = segs.reduce((a, s) => a + s.len, 0);
     const n = Math.max(24, Math.min(64, Math.floor((wave.clientWidth || 260) / 6)));
     job.bars = [];
@@ -889,7 +869,7 @@
       updateAddress();
     });
 
-    const fields = { 'f-intro': 'intro', 'f-recap': 'recap', 'f-safety': 'safety', 'f-close': 'close' };
+    const fields = { 'f-intro': 'intro', 'f-recap': 'recap', 'f-safety': 'safety' };
     for (const [id, key] of Object.entries(fields)) {
       $(id).addEventListener('input', (e) => {
         state.script[key] = e.target.value;

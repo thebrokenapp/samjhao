@@ -101,7 +101,9 @@ def build_parts(script: dict, language: str) -> list[Part]:
         parts.append(Part("safety", _sentence(script["safety"], language), config.TTS_PACE, config.PAUSE_AFTER_SAFETY))
     if script.get("close"):
         parts.append(Part("close", _sentence(script["close"], language), config.TTS_PACE, 0))
-    return [p for p in parts if p.text]
+    parts = [p for p in parts if p.text]
+    parts[-1].pause = 0  # end on the last word, not on silence
+    return parts
 
 
 def create_job(job_id: str, script: dict, language: str, voice: str) -> Job:

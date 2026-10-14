@@ -25,7 +25,7 @@ Long step-by-step texts are hard for many parents to follow, but they already li
 
 ## How it works
 
-1. **Write.** Sarvam-105B writes an intro, 1 to 6 steps, a recap, an optional safety line and a warm close. It writes in the language's own script, keeps button names exactly as they appear on screen, uses the polite form of "you" without pet names, and matches the narrator's gender in languages with gendered verbs (सिखाती हूँ for a female voice, सिखाता हूँ for a male one).
+1. **Write.** Sarvam-105B writes a one-line intro naming the task, 1 to 6 steps, a one-breath recap, and a safety line for money or login tasks. It writes in the language's own script, keeps button names exactly as they appear on screen, uses the polite form of "you" without pet names or filler, and gets gendered verb forms right in languages that have them. The safety line itself is fixed, hand-checked wording in each language rather than LLM output, so the warning can't come out garbled.
 2. **Review.** The steps appear as editable cards. An LLM doesn't know today's exact app screens, so you fix anything that's off before it becomes audio.
 3. **Speak.** Every part goes to Bulbul v4 Flash over HTTP streaming. The intro goes first; the other parts are generated in parallel as soon as it is flowing.
 4. **Play while it's still being made.** Bulbul streams plain MP3 frames (24 kHz, mono, 128 kbps CBR, no headers). Samjhao encodes its pauses (4 seconds after each step) in exactly the same format, so all parts join byte for byte into one stream. The browser plays the intro while later steps are still being generated, and the same bytes become the shareable MP3 (remuxed with ffmpeg to add a duration header, no re-encoding).

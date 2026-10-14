@@ -36,10 +36,9 @@ SCRIPT_SCHEMA = {
         "steps": {"type": "array", "items": {"type": "string"}},
         "recap": {"type": "string"},
         "safety": {"type": ["string", "null"]},
-        "close": {"type": "string"},
         "note": {"type": ["string", "null"]},
     },
-    "required": ["title", "intro", "steps", "recap", "safety", "close", "note"],
+    "required": ["title", "intro", "steps", "recap", "safety", "note"],
     "additionalProperties": False,
 }
 
@@ -131,11 +130,10 @@ CONTENT
 
 PARTS (JSON fields)
 - title: 2 to 5 English words in Latin script naming the task, like "Order food on Swiggy".
-- intro: in one short sentence say what this voice note shows, say how many steps there are (as a digit, matching the steps list), then tell them to take their time and that they can pause this voice note anytime.
+- intro: one short sentence that only names the task, like a title said aloud ("How to put a story on Facebook", in the target language). Nothing else: no step count, no "take your time", no "you can pause".
 - steps: the steps, in order.
 - recap: one breath that runs through all the steps quickly.
-- safety: only if the task itself involves paying money, UPI, banking, OTPs, passwords or logging in. Then one or two sentences that say all of this: never tell your OTP or UPI PIN to anyone who calls you, even if they say they are from the bank. For everything else (calls, video calls, messages, photos, settings, sound) it must be null.
-- close: one short line: if you get stuck, just call me.
+- safety: the word "yes" only if the task itself involves paying money, UPI, banking, OTPs, passwords or logging in (a standard warning is added for you). For everything else (calls, video calls, messages, photos, settings, sound) it must be null.
 - note: null unless the task needs more than 6 steps.
 
 Reply with one JSON object only."""
@@ -152,12 +150,12 @@ FAITHFULNESS
 - The user may have edited the source script. Keep every step, in the same order, with the same meaning and details. Same number of steps; never add, drop, merge or split steps.
 - Keep app names and button labels exactly as they are in the source.
 - If the source calls the listener by name or relation (Maa, Papa, Amma garu and so on), leave that out.
-- The intro must say the number of steps as the digit {steps}, and tell them to take their time and that they can pause this voice note anytime.
-- safety: translate it if the source has one, keep it null if the source's is null.
+- intro: one short sentence that only names the task, like a title said aloud. Nothing else: no step count, no "take your time", no "you can pause".
+- safety: "yes" if the source has one, null if the source's is null (a standard warning is added for you).
 - title and note: copy them unchanged.
 - Never put "Step 1", numbers or bullets before a step.
 
-Reply with one JSON object with the same fields as the source: title, intro, steps, recap, safety, close, note."""
+Reply with one JSON object with the same fields as the source: title, intro, steps, recap, safety, note."""
 
 
 # --- model call --------------------------------------------------------------------------------
@@ -261,21 +259,11 @@ def _strip_address(text: str, words: list[str]) -> str:
 
 def _without_address(script: dict, language: str, custom_name: str | None) -> dict:
     words = _address_words(language, custom_name)
-    for key in ("intro", "recap", "safety", "close"):
+    for key in ("intro", "recap", "safety"):
         if script.get(key):
             script[key] = _strip_address(script[key], words)
     script["steps"] = [s for s in (_strip_address(s, words) for s in script["steps"]) if s]
-    script["intro"] = _fix_step_count(script["intro"], len(script["steps"]))
     return script
-
-
-def _fix_step_count(intro: str, steps: int) -> str:
-    """The LLM sometimes miscounts its own steps; correct the one number in the intro."""
-    numbers = list(re.finditer(r"(?<![\d₹])\d{1,2}(?!\d)", intro))
-    if len(numbers) == 1 and numbers[0].group() != str(steps):
-        m = numbers[0]
-        return intro[:m.start()] + str(steps) + intro[m.end():]
-    return intro
 
 
 def _title_from_task(task: str) -> str:
@@ -324,14 +312,11 @@ def _parse(raw: str, language: str) -> dict:
         "steps": steps[: config.MAX_STEPS],
         "recap": text_field("recap"),
         "safety": text_field("safety", optional=True),
-        "close": text_field("close"),
         "note": text_field("note", optional=True),
     }
-    script["intro"] = _fix_step_count(script["intro"], len(script["steps"]))
-
     writing = config.LANGUAGES[language]["script"]
     if writing != "Latin":
-        spoken = " ".join([script["intro"], *script["steps"], script["recap"], script["close"]])
+        spoken = " ".join([script["intro"], *script["steps"], script["recap"]])
         if _script_share(spoken, writing) < 0.25:
             raise ValueError(f"reply is not written in {writing} script")
     return script
@@ -363,16 +348,18 @@ async def write_script(task: str, language: str, relation: str, custom_name: str
     script = await _generate(WRITE_MODEL, system, user, language, WRITE_TEMPERATURE)
     if not script["title"].isascii():
         script["title"] = _title_from_task(task)
+    script["safety"] = config.SAFETY_LINE[language] if script["safety"] else None
     return _without_address(script, language, custom_name)
 
 
 async def translate_script(script: dict, language: str, relation: str, custom_name: str | None, phone: str, voice: str) -> dict:
     """Rewrite an existing (possibly user-edited) script in `language`, keeping its steps."""
-    source = {k: script.get(k) for k in ("title", "intro", "steps", "recap", "safety", "close", "note")}
+    source = {k: script.get(k) for k in ("title", "intro", "steps", "recap", "safety", "note")}
     system = _translate_system(language, relation, custom_name, phone, voice, len(source["steps"] or []))
     user = "Source script:\n" + json.dumps(source, ensure_ascii=False, indent=2)
     result = await _generate(TRANSLATE_MODEL, system, user, language, TRANSLATE_TEMPERATURE,
                              steps_expected=len(source["steps"] or []))
     result["title"] = source["title"] or result["title"]
     result["note"] = source["note"]
+    result["safety"] = config.SAFETY_LINE[language] if source["safety"] else None
     return _without_address(result, language, custom_name)

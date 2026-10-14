@@ -61,6 +61,20 @@ LANGUAGES = {
 
 PHONES = {"android": "Android", "iphone": "iPhone"}
 
+# Scam-safety line for tasks involving money or login. Fixed text, not LLM-written: a dropped negation here
+# ("believe them" instead of "don't believe them") would be dangerous.
+SAFETY_LINE = {
+    "hi-IN": "कोई भी call करके OTP या UPI PIN माँगे, तो कभी मत बताइए, चाहे वो कहे कि bank से बोल रहा है।",
+    "te-IN": "ఎవరైనా call చేసి OTP లేదా UPI PIN అడిగితే, ఎప్పుడూ చెప్పకండి. Bank నుంచి అని చెప్పినా నమ్మకండి.",
+    "ta-IN": "யாராவது call பண்ணி OTP அல்லது UPI PIN கேட்டா, ஒருபோதும் சொல்லாதீங்க. Bank-ல இருந்து பேசறோம்னு சொன்னாலும் நம்பாதீங்க.",
+    "kn-IN": "ಯಾರಾದರೂ call ಮಾಡಿ OTP ಅಥವಾ UPI PIN ಕೇಳಿದರೆ, ಯಾವತ್ತೂ ಹೇಳಬೇಡಿ. Bank ಇಂದ ಮಾತಾಡ್ತಿದ್ದೀವಿ ಅಂದರೂ ನಂಬಬೇಡಿ.",
+    "mr-IN": "कोणी call करून OTP किंवा UPI PIN विचारला, तर कधीच सांगू नका. Bank मधून बोलतोय असं सांगितलं तरी विश्वास ठेवू नका.",
+    "bn-IN": "কেউ call করে OTP বা UPI PIN চাইলে, কখনও বলবেন না। Bank থেকে বলছি বললেও বিশ্বাস করবেন না।",
+    "gu-IN": "કોઈ call કરીને OTP કે UPI PIN માંગે, તો ક્યારેય કહેશો નહીં. Bank માંથી બોલું છું એમ કહે તો પણ વિશ્વાસ કરશો નહીં.",
+    "pa-IN": "ਜੇ ਕੋਈ call ਕਰਕੇ OTP ਜਾਂ UPI PIN ਮੰਗੇ, ਤਾਂ ਕਦੇ ਨਾ ਦੱਸੋ। ਭਾਵੇਂ ਉਹ ਕਹੇ ਕਿ bank ਤੋਂ ਬੋਲ ਰਿਹਾ ਹਾਂ, ਯਕੀਨ ਨਾ ਕਰੋ।",
+    "en-IN": "Never tell your OTP or UPI PIN to anyone who calls you, even if they say they are from the bank.",
+}
+
 # Bulbul v4 Flash speaker IDs per language, picked from the live speaker list.
 # Tamil has no female persona on v4 Flash yet.
 VOICES: dict[str, dict[str, str]] = {
