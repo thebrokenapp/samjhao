@@ -75,10 +75,11 @@ SAFETY_LINE = {
     "en-IN": "Never tell your OTP or UPI PIN to anyone who calls you, even if they say they are from the bank.",
 }
 
-# Bulbul v4 Flash speaker IDs per language, picked from the live speaker list.
+# Bulbul v4 Flash speaker IDs per language, picked from the live speaker list. Hindi uses the livelier styles
+# (expressive, social) chosen by ear; the calm "customer"/"narration" styles sounded flat.
 # Tamil has no female persona on v4 Flash yet.
 VOICES: dict[str, dict[str, str]] = {
-    "hi-IN": {"female": "aparna_hi_customer", "male": "shubh_hi_customer"},
+    "hi-IN": {"female": "ishita_enhi_customer_expressive", "male": "vaibhav_hi_social"},
     "te-IN": {"female": "kavitha_te_conversation", "male": "tarun_te_narration"},
     "ta-IN": {"male": "gokul_ta_narration"},
     "kn-IN": {"female": "chaitra_kn_conversation", "male": "chetan_kn_conversation"},
@@ -86,7 +87,7 @@ VOICES: dict[str, dict[str, str]] = {
     "bn-IN": {"female": "roopa_bn_conversational", "male": "arnab_bn_conversation"},
     "gu-IN": {"female": "pooja_gu_customer", "male": "bhavik_gu_conversation"},
     "pa-IN": {"female": "harpreet_pa_narration", "male": "anand_pa_customer"},
-    "en-IN": {"female": "aparna_en_companion", "male": "shubh_en_narration_gentle"},
+    "en-IN": {"female": "ishita_enhi_customer_expressive", "male": "shubh_en_narration_gentle"},
 }
 
 # Spoken before each step: "<ordinal> step." Native ordinals, English "step" (natural code-mixing).
@@ -109,9 +110,8 @@ def step_label(language: str, index: int) -> str:
 
 
 TTS_MODEL = "bulbul:v4-flash"
-TTS_PACE = 0.85
-# Any pace other than 1.0 adds ~100 ms before the first audio, so the intro uses 1.0 to keep first sound under 250 ms.
-INTRO_PACE = 1.0
+# Normal speed: 0.85 sounded flat, and any pace other than 1.0 also adds ~100 ms before the first audio.
+TTS_PACE = 1.0
 TTS_SAMPLE_RATE = 24000
 
 # Silence (seconds) inserted after each part of the voice note.

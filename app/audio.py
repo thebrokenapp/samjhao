@@ -91,7 +91,7 @@ def _slug(text: str) -> str:
 
 
 def build_parts(script: dict, language: str) -> list[Part]:
-    parts = [Part("intro", _sentence(script["intro"], language), config.INTRO_PACE, config.PAUSE_AFTER_INTRO)]
+    parts = [Part("intro", _sentence(script["intro"], language), config.TTS_PACE, config.PAUSE_AFTER_INTRO)]
     for i, step in enumerate(script["steps"][: config.MAX_STEPS]):
         text = f"{config.step_label(language, i)}. {_sentence(step, language)}"
         parts.append(Part("step", text, config.TTS_PACE, config.PAUSE_AFTER_STEP))

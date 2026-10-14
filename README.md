@@ -38,7 +38,7 @@ Measured on a home connection in India: Bulbul's first audio in about 210 to 290
 
 | API | Endpoint | Used for |
 |---|---|---|
-| Bulbul v4 Flash text to speech | `POST /text-to-speech/stream`, model `bulbul:v4-flash` | Every part of the voice note. Persona voices such as `aparna_hi_customer` and `kavitha_te_conversation`, `enable_preprocessing: true`, pace 0.85 for steps (Sarvam's recommendation for instructional content) and 1.0 for the intro (fastest first audio) |
+| Bulbul v4 Flash text to speech | `POST /text-to-speech/stream`, model `bulbul:v4-flash` | Every part of the voice note. Lively persona styles such as `ishita_enhi_customer_expressive` and `vaibhav_hi_social` for Hindi, `enable_preprocessing: true`, pace 1.0 (slower pacing sounded flat and delays the first audio) |
 | Sarvam-105B chat completion | `POST /v1/chat/completions`, model `sarvam-105b` | Writing the steps and translating an edited script, with reasoning off and strict JSON-schema output |
 
 ## Run it
