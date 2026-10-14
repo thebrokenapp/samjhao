@@ -6,7 +6,7 @@ You type what your parent needs help with, like "how to order food on Swiggy". S
 
 > It explains things to Maa the way you would: in her language, with the real button names, and with patience.
 
-![Samjhao on a phone: pick the task and who it's for, check the steps in Telugu, and the voice note starts in 203 ms](docs/screenshot.png)
+![Samjhao on a phone: pick the task and who it's for, check the steps in Telugu, and the voice note starts playing in under 300 ms](docs/screenshot.png)
 
 Built for the Sarvam Bulbul Build Challenge.
 
@@ -18,19 +18,19 @@ Long step-by-step texts are hard for many parents to follow, but they already li
 
 | Bulbul v4 Flash | In Samjhao |
 |---|---|
-| Native voices across Indian languages, including respectful forms | "Who is it for" picks the right address per language: *Amma garu* in Telugu, *Aai* in Marathi, *Mummy ji* in Punjabi |
+| Native voices across Indian languages, with respectful speech | Each language uses its polite form of "you" (आप, మీరు, நீங்க), and verbs agree with the listener's and the narrator's gender |
 | Natural code-mixing | App words stay in English inside native-script sentences: "Swiggy app open कीजिए", "Where to? అని ఉన్న box మీద tap చేయండి" |
 | Numbers, OTPs and ₹ amounts | Digits and ₹ amounts are left to Bulbul's preprocessing, and money or login tasks get a scam-safety line about OTPs and UPI PINs |
 | Speed | The note starts playing about a quarter of a second after you tap, and the app shows Bulbul's measured time to first audio |
 
 ## How it works
 
-1. **Write.** Sarvam-105B writes an intro, 1 to 6 steps, a recap, an optional safety line and a warm close. It writes in the language's own script, keeps button names exactly as they appear on screen, addresses the listener respectfully, and matches the narrator's gender in languages with gendered verbs (सिखाती हूँ for a female voice, सिखाता हूँ for a male one).
+1. **Write.** Sarvam-105B writes an intro, 1 to 6 steps, a recap, an optional safety line and a warm close. It writes in the language's own script, keeps button names exactly as they appear on screen, uses the polite form of "you" without pet names, and matches the narrator's gender in languages with gendered verbs (सिखाती हूँ for a female voice, सिखाता हूँ for a male one).
 2. **Review.** The steps appear as editable cards. An LLM doesn't know today's exact app screens, so you fix anything that's off before it becomes audio.
 3. **Speak.** Every part goes to Bulbul v4 Flash over HTTP streaming. The intro goes first; the other parts are generated in parallel as soon as it is flowing.
 4. **Play while it's still being made.** Bulbul streams plain MP3 frames (24 kHz, mono, 128 kbps CBR, no headers). Samjhao encodes its pauses (4 seconds after each step) in exactly the same format, so all parts join byte for byte into one stream. The browser plays the intro while later steps are still being generated, and the same bytes become the shareable MP3 (remuxed with ffmpeg to add a duration header, no re-encoding).
 5. **Share.** The Web Share API hands the MP3 to WhatsApp, with Download as a fallback.
-6. **Hear it in another language.** One tap translates your *edited* script, keeping your fixes and the English button names and switching to the right address form, then plays it.
+6. **Hear it in another language.** One tap translates your *edited* script, keeping your fixes and the English button names, then plays it.
 
 Measured on a home connection in India: Bulbul's first audio in about 210 to 290 ms, a full 85-second Hindi note generated in under 3 seconds, and a script written in about 1.5 seconds.
 
@@ -68,7 +68,7 @@ app/
   llm.py      writing and translating the steps (Sarvam-105B)
   tts.py      Bulbul v4 Flash streaming client
   audio.py    voice-note builder: parallel synthesis, live stream, final MP3
-  config.py   languages, address forms, voices, pauses
+  config.py   languages, voices, step labels, pauses
 static/       the one-page app (plain HTML, CSS and JavaScript)
 scripts/      smoke tests for the TTS and LLM calls
 ```

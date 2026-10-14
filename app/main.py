@@ -76,8 +76,6 @@ class Audience(BaseModel):
             raise ValueError("unsupported language")
         if self.relation not in config.RELATIONS:
             raise ValueError("unknown relation")
-        if self.relation == "custom" and not (self.custom_name or "").strip():
-            raise ValueError("enter a name")
         if self.phone not in config.PHONES:
             raise ValueError("unknown phone")
         if self.voice not in ("female", "male"):

@@ -9,7 +9,7 @@ RELATIONS = {
     "custom": {"label": "Someone else", "listener_gender": None},
 }
 
-# address: relation -> (native script, Latin transliteration for the UI)
+# address: relation -> (native script, Latin) forms of address. The voice note never uses them: llm.py strips them if the model adds one.
 # style: register guidance passed to the LLM
 LANGUAGES = {
     "hi-IN": {

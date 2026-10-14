@@ -109,15 +109,6 @@
     return { subj: 'They', poss: 'their' };
   }
 
-  function addressFor(code, relation, customName) {
-    if (relation === 'custom') {
-      const n = (customName || '').trim();
-      return n ? { native: n, latin: n } : null;
-    }
-    const l = state.langs[code];
-    return (l && l.address && l.address[relation]) || null;
-  }
-
   function radio(name, value, checked, labelClass, content, disabled) {
     const input = h('input', { type: 'radio', name, value });
     input.checked = !!checked;
@@ -178,20 +169,15 @@
     });
   }
 
+  // Who the page talks about. The voice note itself never calls them by name or relation.
+  function whoLabel(relation, customName) {
+    if (relation === 'custom') return (customName || '').trim() || 'your family';
+    return relationInfo(relation).label || 'Maa';
+  }
+
   function updateAddress() {
     const p = pronouns(state.relation);
-    const addr = addressFor(state.lang, state.relation, state.customName);
-    const hint = $('address-hint');
-    hint.textContent = '';
-    if (state.relation === 'custom' && !addr) {
-      hint.append(h('span', { text: 'Type the name you call them, and Samjhao will use it.' }));
-    } else if (addr) {
-      hint.append(h('span', { text: `${p.subj}'ll hear` }));
-      hint.append(h('span', { class: 'native', lang: state.relation === 'custom' ? null : shortLang(state.lang), text: addr.native }));
-      if (addr.latin && addr.latin !== addr.native) hint.append(h('span', { class: 'latin', text: `(${addr.latin})` }));
-    }
-    const name = addr ? addr.latin : (state.relation === 'custom' ? 'your family' : 'Maa');
-    $('hl-name').textContent = name;
+    $('hl-name').textContent = whoLabel(state.relation, state.customName);
     $('hl-pron').textContent = p.poss;
     $('pitch').textContent = `It explains things the way you would: in ${p.poss} language, with the real button names, and with patience.`;
   }
@@ -221,7 +207,6 @@
     if (state.busy) return;
     const task = $('task').value.trim();
     if (task.length < 3) return showFormError('Type what you want to explain, or pick an example.', $('task'));
-    if (state.relation === 'custom' && !state.customName.trim()) return showFormError('Add the name you call them.', $('custom-name'));
     hideFormError();
 
     state.busy = true;
@@ -333,9 +318,8 @@
 
   function updateMeta() {
     const f = state.scriptFor || { relation: state.relation, customName: state.customName, phone: state.phone };
-    const addr = addressFor(state.scriptLang, f.relation, f.customName);
     const phone = ((state.config.phones || []).find((p) => p.id === f.phone) || { label: f.phone }).label;
-    const who = addr ? addr.latin : 'them';
+    const who = whoLabel(f.relation, f.customName);
     $('lesson-meta').textContent = `In ${langName(state.scriptLang)}, for ${who}, on ${phone}.`;
     $('help-pron').textContent = pronouns(f.relation).poss;
   }

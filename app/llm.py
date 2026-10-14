@@ -81,7 +81,6 @@ SCRIPT_RANGES = {
 def _language_rules(language: str, relation: str, custom_name: str | None, voice: str) -> str:
     lang = config.LANGUAGES[language]
     name, script = lang["name"], lang["script"]
-    address = config.address_for(language, relation, custom_name)
     listener_gender = config.RELATIONS[relation]["listener_gender"]
     full_stop = "।" if language in DANDA_LANGUAGES else "."
 
@@ -98,15 +97,12 @@ def _language_rules(language: str, relation: str, custom_name: str | None, voice
         f"- Short spoken sentences, 12 words or fewer. Commas for small pauses. End sentences with {full_stop} "
         "No ellipses, no emojis, no markdown, no quotation marks around button names.",
         "",
-        "ADDRESS",
+        "HOW TO SPEAK TO THEM",
+        "- Never call the listener by name or relation: no Maa, Mummy, Papa, Amma, Appa, Dadi, Nani, Aai, Baba, garu or "
+        "ji forms, no beta, no dear. Just speak to them directly with the respectful you form.",
+        "- Friendly and matter-of-fact, like a patient helpline voice. No greetings (hello, namaste, vanakkam) and no "
+        "emotional lines such as I am here for you, don't worry or I love you.",
     ]
-    if relation == "custom":
-        lines.append(f'- Call the listener by name: "{address}". Write the name in {script} script, adding the respectful '
-                     "suffix this language naturally uses for an elder (like ji or garu) if it fits.")
-    else:
-        lines.append(f'- Call the listener "{address}", exactly like this.')
-    lines.append("- Open the intro with the address itself: no hello, namaste or vanakkam. Use the address again in the "
-                 "close, and at most once more. Never start every step with it.")
     if listener_gender:
         lines.append(f"- The listener is {listener_gender}; use matching forms whenever you refer to them.")
     else:
@@ -122,7 +118,7 @@ def _language_rules(language: str, relation: str, custom_name: str | None, voice
 def _write_system(language: str, relation: str, custom_name: str | None, phone: str, voice: str) -> str:
     phone_name = config.PHONES[phone]
     sender = "grandchild" if relation in ("dadi", "nani") else "grown-up child"
-    return f"""You write the script for a short WhatsApp voice note. It teaches an Indian {LISTENER[relation]} how to do one thing on their {phone_name}. Their {sender} sends it, and a text-to-speech voice reads it aloud. Write for the ear: warm, patient and simple, like a loving {sender} explaining in person.
+    return f"""You write the script for a short WhatsApp voice note. It teaches an Indian {LISTENER[relation]} how to do one thing on their {phone_name}. Their {sender} sends it, and a text-to-speech voice reads it aloud. Write for the ear: clear, patient and simple.
 
 {_language_rules(language, relation, custom_name, voice)}
 
@@ -135,11 +131,11 @@ CONTENT
 
 PARTS (JSON fields)
 - title: 2 to 5 English words in Latin script naming the task, like "Order food on Swiggy".
-- intro: start with the address, say what you'll show them, say how many steps there are (as a digit, matching the steps list), then tell them to take their time and that they can pause this voice note anytime.
+- intro: in one short sentence say what this voice note shows, say how many steps there are (as a digit, matching the steps list), then tell them to take their time and that they can pause this voice note anytime.
 - steps: the steps, in order.
 - recap: one breath that runs through all the steps quickly.
 - safety: only if the task itself involves paying money, UPI, banking, OTPs, passwords or logging in. Then one or two sentences that say all of this: never tell your OTP or UPI PIN to anyone who calls you, even if they say they are from the bank. For everything else (calls, video calls, messages, photos, settings, sound) it must be null.
-- close: short and warm, with the address: if you get stuck, just call me.
+- close: one short line: if you get stuck, just call me.
 - note: null unless the task needs more than 6 steps.
 
 Reply with one JSON object only."""
@@ -148,15 +144,15 @@ Reply with one JSON object only."""
 def _translate_system(language: str, relation: str, custom_name: str | None, phone: str, voice: str, steps: int) -> str:
     phone_name = config.PHONES[phone]
     name = config.LANGUAGES[language]["name"]
-    return f"""You rewrite the script of a short WhatsApp voice note in {name}. It teaches an Indian {LISTENER[relation]} how to do one thing on their {phone_name}, and a text-to-speech voice reads it aloud. Write for the ear: warm, patient and simple. Sound like a native {name} speaker talking, not like a translation.
+    return f"""You rewrite the script of a short WhatsApp voice note in {name}. It teaches an Indian {LISTENER[relation]} how to do one thing on their {phone_name}, and a text-to-speech voice reads it aloud. Write for the ear: clear, patient and simple. Sound like a native {name} speaker talking, not like a translation.
 
 {_language_rules(language, relation, custom_name, voice)}
 
 FAITHFULNESS
 - The user may have edited the source script. Keep every step, in the same order, with the same meaning and details. Same number of steps; never add, drop, merge or split steps.
 - Keep app names and button labels exactly as they are in the source.
-- Wherever the source addresses the listener, use the address above instead.
-- The intro must say the number of steps as the digit {steps}, open with the address itself (no hello, namaste or vanakkam), and tell them to take their time and that they can pause this voice note anytime.
+- If the source calls the listener by name or relation (Maa, Papa, Amma garu and so on), leave that out.
+- The intro must say the number of steps as the digit {steps}, and tell them to take their time and that they can pause this voice note anytime.
 - safety: translate it if the source has one, keep it null if the source's is null.
 - title and note: copy them unchanged.
 - Never put "Step 1", numbers or bullets before a step.
@@ -228,6 +224,49 @@ def _clean(text: str) -> str:
     text = _EMOJI.sub("", _MARKDOWN.sub("", text))
     text = re.sub(r"\s+([,.।?!])", r"\1", text)
     return re.sub(r"\s+", " ", text).strip(" ,")
+
+
+# The voice note never calls the listener "Maa", "Amma garu" and so on. If the model does it anyway, these are
+# removed, but only in vocative positions (start or end of a sentence, or between commas).
+EXTRA_ADDRESS = {
+    "hi-IN": ["मां", "मम्मी", "मम्मी जी", "पापा जी", "दादी जी", "नानी जी", "अम्मा"],
+    "te-IN": ["అమ్మా", "అమ్మ", "నాన్నా", "నాన్న", "నానమ్మా", "అమ్మమ్మా"],
+    "ta-IN": ["அம்மா", "அப்பா", "பாட்டி"],
+    "kn-IN": ["ಅಮ್ಮ", "ಅಪ್ಪ"],
+    "mr-IN": ["आई", "बाबा", "आजी"],
+    "bn-IN": ["মা", "বাবা"],
+    "gu-IN": ["બા", "મમ્મી", "પપ્પા"],
+    "pa-IN": ["ਮੰਮੀ", "ਪਾਪਾ", "ਮਾਂ ਜੀ", "ਬੀਜੀ"],
+    "en-IN": ["Maa", "Mom", "Mummy", "Papa", "Dad", "Dadi", "Nani"],
+}
+
+
+def _address_words(language: str, custom_name: str | None) -> list[str]:
+    words = {w for forms in config.LANGUAGES[language]["address"].values() for w in forms}
+    words.update(EXTRA_ADDRESS.get(language, ()))
+    words.update(w[:-1] + "ు" for w in list(words) if w.endswith("ూ"))  # Telugu: గారూ and గారు
+    if custom_name and custom_name.strip():
+        words.add(custom_name.strip())
+    return sorted(words, key=len, reverse=True)
+
+
+def _strip_address(text: str, words: list[str]) -> str:
+    alt = "|".join(re.escape(w) for w in words)
+    text = re.sub(rf"(^|[.।!?]\s+)(?:{alt})\s*,\s*", r"\1", text)  # "माँ, पहले ..."
+    text = re.sub(rf"\s*,\s*(?:{alt})\s*,", ",", text)  # "अब, माँ, Search ..."
+    text = re.sub(rf"[\s,]+(?:{alt})\s*([.।!?])", r"\1", text)  # "... call कर लीजिएगा माँ।"
+    text = re.sub(r"(^|[.!?]\s+)([a-z])", lambda m: m[1] + m[2].upper(), text)
+    return text.strip()
+
+
+def _without_address(script: dict, language: str, custom_name: str | None) -> dict:
+    words = _address_words(language, custom_name)
+    for key in ("intro", "recap", "safety", "close"):
+        if script.get(key):
+            script[key] = _strip_address(script[key], words)
+    script["steps"] = [s for s in (_strip_address(s, words) for s in script["steps"]) if s]
+    script["intro"] = _fix_step_count(script["intro"], len(script["steps"]))
+    return script
 
 
 def _fix_step_count(intro: str, steps: int) -> str:
@@ -324,7 +363,7 @@ async def write_script(task: str, language: str, relation: str, custom_name: str
     script = await _generate(WRITE_MODEL, system, user, language, WRITE_TEMPERATURE)
     if not script["title"].isascii():
         script["title"] = _title_from_task(task)
-    return script
+    return _without_address(script, language, custom_name)
 
 
 async def translate_script(script: dict, language: str, relation: str, custom_name: str | None, phone: str, voice: str) -> dict:
@@ -336,4 +375,4 @@ async def translate_script(script: dict, language: str, relation: str, custom_na
                              steps_expected=len(source["steps"] or []))
     result["title"] = source["title"] or result["title"]
     result["note"] = source["note"]
-    return result
+    return _without_address(result, language, custom_name)
