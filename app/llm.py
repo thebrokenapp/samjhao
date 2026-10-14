@@ -55,7 +55,10 @@ LISTENER = {"maa": "mother", "papa": "father", "dadi": "grandmother (father's mo
 
 PHONE_HINTS = {
     "android": "Android phones have a Back button or back gesture at the bottom of the screen, and apps come from Play Store.",
-    "iphone": "iPhones have no Back button: going back is the arrow at the top-left of the screen, swiping up from the bottom goes home, and apps come from App Store.",
+    "iphone": "iPhones have no Back button: going back is the arrow at the top-left of the screen, swiping up from the bottom goes home, and apps come from App Store. "
+              "Silent mode is the small switch on the LEFT side, above the two volume buttons: an orange mark showing means silent, and flipping "
+              "the switch toward the screen hides the orange and turns sound back on. On iPhone 15 Pro and newer it is the Action button in the "
+              "same place, pressed and held. The volume buttons are on the left side too; the only button on the right side is the power button.",
 }
 
 # First-person examples for languages whose verbs show the speaker's gender: (female, male).
