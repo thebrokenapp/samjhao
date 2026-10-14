@@ -135,7 +135,7 @@ PARTS (JSON fields)
 - intro: start with the address, say what you'll show them, say how many steps there are (as a digit, matching the steps list), then tell them to take their time and that they can pause this voice note anytime.
 - steps: the steps, in order.
 - recap: one breath that runs through all the steps quickly.
-- safety: only if the task involves money, payments, UPI, banking, OTP, passwords or logging in. Then one or two sentences that say all of this: never tell your OTP or UPI PIN to anyone who calls you, even if they say they are from the bank. Otherwise null.
+- safety: only if the task itself involves paying money, UPI, banking, OTPs, passwords or logging in. Then one or two sentences that say all of this: never tell your OTP or UPI PIN to anyone who calls you, even if they say they are from the bank. For everything else (calls, video calls, messages, photos, settings, sound) it must be null.
 - close: short and warm, with the address: if you get stuck, just call me.
 - note: null unless the task needs more than 6 steps.
 

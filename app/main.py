@@ -128,6 +128,7 @@ def get_config():
         "relations": [{"id": rel, **info} for rel, info in config.RELATIONS.items()],
         "phones": [{"id": pid, "label": label} for pid, label in config.PHONES.items()],
         "max_steps": config.MAX_STEPS,
+        "pause_after_step": config.PAUSE_AFTER_STEP,
     }
 
 
