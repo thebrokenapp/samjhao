@@ -98,17 +98,6 @@
 
   // ---------- form ----------
 
-  function relationInfo(id) {
-    return (state.config.relations || []).find((r) => r.id === id) || { listener_gender: null };
-  }
-
-  function pronouns(relation) {
-    const g = relationInfo(relation).listener_gender;
-    if (g === 'female') return { subj: 'She', poss: 'her' };
-    if (g === 'male') return { subj: 'He', poss: 'his' };
-    return { subj: 'They', poss: 'their' };
-  }
-
   function radio(name, value, checked, labelClass, content, disabled) {
     const input = h('input', { type: 'radio', name, value });
     input.checked = !!checked;
@@ -147,7 +136,6 @@
       .forEach(([id, label]) => voices.append(radio('voice', id, id === state.voice, 'seg', h('span', { text: label }))));
 
     updateVoices();
-    updateAddress();
   }
 
   function availableVoices(code) {
@@ -169,24 +157,10 @@
     });
   }
 
-  // Who the page talks about. The voice note itself never calls them by name or relation.
-  function whoLabel(relation, customName) {
-    if (relation === 'custom') return (customName || '').trim() || 'your family';
-    return relationInfo(relation).label || 'Maa';
-  }
-
-  function updateAddress() {
-    const p = pronouns(state.relation);
-    $('hl-name').textContent = whoLabel(state.relation, state.customName);
-    $('hl-pron').textContent = p.poss;
-    $('pitch').textContent = `It explains things the way you would: in ${p.poss} language, with the real button names, and with patience.`;
-  }
-
   function setLanguage(code) {
     state.lang = code;
     document.querySelectorAll('input[name="language"]').forEach((i) => { i.checked = i.value === code; });
     updateVoices();
-    updateAddress();
     updateLangBanner();
   }
 
@@ -318,9 +292,7 @@
   function updateMeta() {
     const f = state.scriptFor || { relation: state.relation, customName: state.customName, phone: state.phone };
     const phone = ((state.config.phones || []).find((p) => p.id === f.phone) || { label: f.phone }).label;
-    const who = whoLabel(f.relation, f.customName);
-    $('lesson-meta').textContent = `In ${langName(state.scriptLang)}, for ${who}, on ${phone}.`;
-    $('help-pron').textContent = pronouns(f.relation).poss;
+    $('lesson-meta').textContent = `In ${langName(state.scriptLang)}, on ${phone}.`;
   }
 
   function renderSteps() {
@@ -852,11 +824,9 @@
         state.relation = t.value;
         $('custom-name-wrap').hidden = t.value !== 'custom';
         if (t.value === 'custom') $('custom-name').focus();
-        updateAddress();
       } else if (t.name === 'language') {
         state.lang = t.value;
         updateVoices();
-        updateAddress();
         updateLangBanner();
       } else if (t.name === 'phone') {
         state.phone = t.value;
@@ -866,7 +836,6 @@
     });
     $('custom-name').addEventListener('input', (e) => {
       state.customName = e.target.value;
-      updateAddress();
     });
 
     const fields = { 'f-intro': 'intro', 'f-recap': 'recap', 'f-safety': 'safety' };

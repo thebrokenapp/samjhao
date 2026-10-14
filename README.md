@@ -4,7 +4,7 @@
 
 You type what your parent needs help with, like "how to order food on Swiggy". Samjhao writes short, clear steps in their language, you check them, and Sarvam's Bulbul v4 Flash turns them into one warm, patient voice note that you share on WhatsApp. Your parent plays it and follows along on their phone.
 
-> It explains things to Maa the way you would: in her language, with the real button names, and with patience.
+> Any phone task, explained in one voice note: in their language, with the real button names.
 
 ![Samjhao on a phone: pick the task and who it's for, check the steps in Telugu, and the voice note starts playing in under 300 ms](docs/screenshot.png)
 
