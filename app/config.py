@@ -116,7 +116,7 @@ TTS_SAMPLE_RATE = 24000
 
 # Silence (seconds) inserted after each part of the voice note.
 PAUSE_AFTER_INTRO = 1.0
-PAUSE_AFTER_STEP = 4.0
+PAUSE_AFTER_STEP = 2.0
 PAUSE_AFTER_RECAP = 1.0
 PAUSE_AFTER_SAFETY = 0.8
 MAX_STEPS = 6
