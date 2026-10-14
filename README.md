@@ -6,7 +6,7 @@ You type what your parent needs help with, like "how to order food on Swiggy". S
 
 > It explains things to Maa the way you would: in her language, with the real button names, and with patience.
 
-<!-- screenshot -->
+![Samjhao on a phone: pick the task and who it's for, check the steps in Telugu, and the voice note starts in 203 ms](docs/screenshot.png)
 
 Built for the Sarvam Bulbul Build Challenge.
 
