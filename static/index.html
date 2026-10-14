@@ -1,0 +1,219 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Samjhao: phone help for parents, in their language</title>
+  <meta name="description" content="Turn phone instructions into one warm, patient voice note in your parent's language. Powered by Sarvam Bulbul v4 Flash.">
+  <meta name="theme-color" content="#F3F5FB">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M6 3h20a4 4 0 0 1 4 4v13a4 4 0 0 1-4 4H14l-6 5v-5H6a4 4 0 0 1-4-4V7a4 4 0 0 1 4-4z' fill='%232D3C93'/%3E%3Crect x='9' y='10.5' width='3' height='7' rx='1.5' fill='%23F2B035'/%3E%3Crect x='14.5' y='7.5' width='3' height='13' rx='1.5' fill='%23F2B035'/%3E%3Crect x='20' y='11.5' width='3' height='5' rx='1.5' fill='%23F2B035'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anek+Latin:wdth,wght@75..125,300..800&family=Anek+Devanagari:wdth,wght@75..125,300..800&family=Anek+Telugu:wdth,wght@75..125,300..800&family=Anek+Tamil:wdth,wght@75..125,300..800&family=Anek+Kannada:wdth,wght@75..125,300..800&family=Anek+Bangla:wdth,wght@75..125,300..800&family=Anek+Gujarati:wdth,wght@75..125,300..800&family=Anek+Gurmukhi:wdth,wght@75..125,300..800&display=swap">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a class="skip" href="#task">Skip to the form</a>
+
+  <header class="topbar">
+    <a class="brand" href="./" aria-label="Samjhao, start over">
+      <svg class="logo" viewBox="0 0 32 32" aria-hidden="true">
+        <path d="M6 3h20a4 4 0 0 1 4 4v13a4 4 0 0 1-4 4H14l-6 5v-5H6a4 4 0 0 1-4-4V7a4 4 0 0 1 4-4z" fill="#2D3C93"/>
+        <rect x="9" y="10.5" width="3" height="7" rx="1.5" fill="#F2B035"/>
+        <rect x="14.5" y="7.5" width="3" height="13" rx="1.5" fill="#F2B035"/>
+        <rect x="20" y="11.5" width="3" height="5" rx="1.5" fill="#F2B035"/>
+      </svg>
+      <span class="wordmark">Samjhao</span>
+    </a>
+    <p class="powered">Voice by Sarvam Bulbul v4 Flash</p>
+  </header>
+
+  <main class="layout">
+    <div class="hero">
+      <h1 id="headline" class="headline">Phone help for <span id="hl-name">Maa</span>, in <span id="hl-pron">her</span> own language.</h1>
+      <p class="pitch" id="pitch">It explains things the way you would: in her language, with the real button names, and with patience.</p>
+    </div>
+
+    <section class="composer" aria-label="What to explain, and to whom">
+      <form id="form" class="form" novalidate>
+        <div class="field">
+          <label for="task" class="field-label">What do you want to explain?</label>
+          <textarea id="task" class="task-input" rows="2" maxlength="200" autocomplete="off" placeholder="For example: how to order food on Swiggy"></textarea>
+          <div class="examples" id="examples" aria-label="Examples">
+            <button type="button" class="example" data-task="How to order food on Swiggy">Order on Swiggy</button>
+            <button type="button" class="example" data-task="How to book an auto on Ola">Book Ola auto</button>
+            <button type="button" class="example" data-task="How to turn off silent mode">Turn off silent mode</button>
+            <button type="button" class="example" data-task="How to make a UPI payment">Make a UPI payment</button>
+            <button type="button" class="example" data-task="How to make a video call on WhatsApp">Video call on WhatsApp</button>
+          </div>
+        </div>
+
+        <fieldset class="field">
+          <legend class="field-label">Who is it for?</legend>
+          <div class="pills" id="relations"></div>
+          <div class="custom-name" id="custom-name-wrap" hidden>
+            <label for="custom-name" class="sr-only">Their name</label>
+            <input id="custom-name" type="text" maxlength="40" autocomplete="off" placeholder="Their name, the way you say it">
+          </div>
+          <p class="hint" id="address-hint" aria-live="polite"></p>
+        </fieldset>
+
+        <fieldset class="field">
+          <legend class="field-label">Language</legend>
+          <div class="lang-grid" id="languages"></div>
+        </fieldset>
+
+        <div class="field-pair">
+          <fieldset class="field">
+            <legend class="field-label">Their phone</legend>
+            <div class="segmented" id="phones"></div>
+          </fieldset>
+          <fieldset class="field">
+            <legend class="field-label">Voice</legend>
+            <div class="segmented" id="voices"></div>
+          </fieldset>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block" id="write-btn">Write the steps</button>
+        <p class="form-error" id="form-error" role="alert" hidden></p>
+      </form>
+    </section>
+
+    <section class="lesson" id="lesson" aria-label="Your voice note">
+      <div class="empty" id="empty">
+        <h2 class="empty-title">Your voice note, step by step</h2>
+        <p class="empty-text">Samjhao writes short steps, you check them, and Bulbul reads them out with time to follow along.</p>
+        <ol class="rhythm" aria-label="What the voice note sounds like">
+          <li><span class="rhythm-dot"></span><span>A warm hello, by name</span></li>
+          <li><span class="rhythm-dot rhythm-step">1</span><span>Step one, with the real button names</span></li>
+          <li class="rhythm-pause"><span class="rhythm-gap"></span><span>4 seconds to do it</span></li>
+          <li><span class="rhythm-dot rhythm-step">2</span><span>Step two, and so on, up to six</span></li>
+          <li class="rhythm-pause"><span class="rhythm-gap"></span><span>4 seconds to do it</span></li>
+          <li><span class="rhythm-dot"></span><span>A quick recap</span></li>
+          <li><span class="rhythm-dot"></span><span>A safety reminder when money or login is involved</span></li>
+          <li><span class="rhythm-dot"></span><span>"If you get stuck, just call me."</span></li>
+        </ol>
+      </div>
+
+      <div class="writing" id="writing" hidden>
+        <p class="writing-status" id="writing-status" role="status" aria-live="polite">Writing the steps…</p>
+        <div class="ghost-card"></div>
+        <div class="ghost-card"></div>
+        <div class="ghost-card"></div>
+        <div class="ghost-card short"></div>
+      </div>
+
+      <div class="editor" id="editor" hidden>
+        <header class="lesson-head">
+          <h2 class="lesson-title" id="lesson-title"></h2>
+          <p class="lesson-meta" id="lesson-meta"></p>
+          <p class="lesson-help">Check each step against <span id="help-pron">her</span> phone and fix anything that looks different. Your changes go straight into the voice note.</p>
+          <p class="notice" id="lesson-note" hidden></p>
+          <div class="notice notice-action" id="lang-banner" hidden>
+            <span id="lang-banner-text"></span>
+            <button type="button" class="btn btn-small" id="lang-banner-btn"></button>
+          </div>
+        </header>
+
+        <div class="timeline">
+          <div class="part part-soft" data-part="intro">
+            <span class="node" aria-hidden="true"></span>
+            <label class="part-label" for="f-intro">Intro</label>
+            <textarea id="f-intro" class="part-text" rows="1"></textarea>
+          </div>
+
+          <ol class="steps" id="steps"></ol>
+
+          <div class="add-row">
+            <button type="button" class="btn btn-quiet" id="add-step">Add a step</button>
+          </div>
+
+          <div class="part part-soft" data-part="recap">
+            <span class="node" aria-hidden="true"></span>
+            <label class="part-label" for="f-recap">Recap</label>
+            <textarea id="f-recap" class="part-text" rows="1"></textarea>
+          </div>
+
+          <div class="part part-safety" data-part="safety" id="safety-part" hidden>
+            <span class="node node-safety" aria-hidden="true"></span>
+            <div class="part-label-row">
+              <label class="part-label" for="f-safety">Safety reminder</label>
+              <label class="switch">
+                <input type="checkbox" id="safety-on" checked>
+                <span class="switch-track" aria-hidden="true"></span>
+                <span class="switch-text">Include</span>
+              </label>
+            </div>
+            <textarea id="f-safety" class="part-text" rows="1"></textarea>
+          </div>
+
+          <div class="part part-soft" data-part="close">
+            <span class="node" aria-hidden="true"></span>
+            <label class="part-label" for="f-close">Closing</label>
+            <textarea id="f-close" class="part-text" rows="1"></textarea>
+          </div>
+        </div>
+
+        <div class="dock" id="dock">
+          <div class="dock-make" id="dock-make">
+            <button type="button" class="btn btn-haldi btn-block" id="make-btn">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V6a3 3 0 0 0-3-3zm-7 9a1 1 0 1 1 2 0 5 5 0 0 0 10 0 1 1 0 1 1 2 0 7 7 0 0 1-6 6.93V21a1 1 0 1 1-2 0v-2.07A7 7 0 0 1 5 12z" fill="currentColor"/></svg>
+              <span id="make-label">Make voice note</span>
+            </button>
+            <p class="dock-sub" id="make-sub"></p>
+          </div>
+
+          <div class="player" id="player" hidden>
+            <div class="player-row">
+              <button type="button" class="play" id="play-btn" aria-label="Play">
+                <svg class="i-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13a1 1 0 0 0 1.5.86l10.5-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5z" fill="currentColor"/></svg>
+                <svg class="i-pause" viewBox="0 0 24 24" aria-hidden="true"><rect x="6.5" y="5" width="4" height="14" rx="1.2" fill="currentColor"/><rect x="13.5" y="5" width="4" height="14" rx="1.2" fill="currentColor"/></svg>
+              </button>
+              <div class="wave-wrap">
+                <div class="wave" id="wave" aria-hidden="true"></div>
+                <div class="wave-meta">
+                  <span class="time" id="time">0:00</span>
+                  <span class="player-status" id="player-status" role="status" aria-live="polite">Starting…</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="player-mid">
+            <p class="ttfb" id="ttfb" hidden>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2 4.5 13.5H11L10 22l8.5-11.5H12L13 2z" fill="currentColor"/></svg>
+              <span class="ttfb-label">First sound in</span>
+              <span class="ttfb-num" id="ttfb-num">0</span><span class="ttfb-unit">ms</span>
+            </p>
+
+            <div class="actions">
+              <button type="button" class="btn btn-share" id="share-btn" disabled>
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 16a3 3 0 0 0-2.4 1.2l-6.7-3.4a3 3 0 0 0 0-1.6l6.7-3.4A3 3 0 1 0 15 7l-6.7 3.4a3 3 0 1 0 0 3.2L15 17a3 3 0 1 0 3-1z" fill="currentColor"/></svg>
+                <span id="share-label">Preparing…</span>
+              </button>
+              <a class="btn btn-outline is-disabled" id="download-btn" aria-disabled="true" role="button">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a1 1 0 0 1 1 1v9.6l3.3-3.3a1 1 0 1 1 1.4 1.4l-5 5a1 1 0 0 1-1.4 0l-5-5a1 1 0 1 1 1.4-1.4l3.3 3.3V4a1 1 0 0 1 1-1zM5 19h14a1 1 0 1 1 0 2H5a1 1 0 1 1 0-2z" fill="currentColor"/></svg>
+                <span>Download</span>
+              </a>
+            </div>
+            </div>
+            <p class="share-hint" id="share-hint" aria-live="polite" hidden></p>
+
+            <div class="others" id="others">
+              <p class="others-label">Hear it in another language</p>
+              <div class="others-row" id="other-langs"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p>Powered by Sarvam Bulbul v4 Flash. Nothing you type is stored.</p>
+  </footer>
+
+  <audio id="audio" preload="none"></audio>
+  <noscript><p class="noscript">Samjhao needs JavaScript to write and play voice notes.</p></noscript>
+  <script src="app.js" defer></script>
+</body>
+</html>
