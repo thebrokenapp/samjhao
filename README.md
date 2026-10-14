@@ -32,7 +32,7 @@ Long step-by-step texts are hard for many parents to follow, but they already li
 5. **Share.** The Web Share API hands the MP3 to WhatsApp, with Download as a fallback.
 6. **Hear it in another language.** One tap translates your *edited* script, keeping your fixes and the English button names, then plays it.
 
-Measured on a home connection in India: Bulbul's first audio in about 210 to 290 ms, a full 85-second Hindi note generated in under 3 seconds, and a script written in about 1.5 seconds.
+Measured on a home connection in India: Bulbul's first audio in about 200 to 250 ms, a whole voice note generated in under 3 seconds, and the steps written in about 1.5 seconds.
 
 ## Sarvam APIs used
 
